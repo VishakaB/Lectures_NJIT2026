@@ -39,17 +39,18 @@ String dbpath = "jdbc:sqlite:" + dbname;
 
 public void initializetable(){
 //initialize tables
+//use keyword IF NOT EXISTS to prevent the table getting created again
 String createtable = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NULL, message varchar(50) NOT NULL)";
 
-    try {
-        Statement createstatement = dbConnection.createStatement();
-        createstatement.execute(createtable);
-        System.out.println("Database table successfully created");
-        createstatement.close();
-    } catch (Exception e) {
-        // TODO: handle exception
-        System.err.println("create table sql exception: "+ e.getMessage());
-    }
+        try {
+            Statement createstatement = dbConnection.createStatement();
+            createstatement.execute(createtable);
+            System.out.println("Database table successfully created");
+            createstatement.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.err.println("create table sql exception: "+ e.getMessage());
+        }
 }
 //create a method to store data in the tables 
 public void setMessage(JSONObject message) throws SQLException{

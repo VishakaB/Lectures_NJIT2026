@@ -76,6 +76,12 @@ public void setMessage(JSONObject message) throws SQLException{
 
 }
 
-
+public void close(){
+   try {
+        dbConnection.close();
+   } catch (Exception e) {
+    // TODO: handle exception
+   }
+}
 
 }

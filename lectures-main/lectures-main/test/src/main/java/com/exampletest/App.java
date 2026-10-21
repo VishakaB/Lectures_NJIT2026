@@ -1,6 +1,5 @@
 package com.exampletest;
 import java.lang.String;
-import java.sql.SQLException;
 import org.json.JSONObject;
 
 public class App {
@@ -23,5 +22,8 @@ public class App {
     }
 
     System.out.println(obj);
+    //close database
+    db.close();
+    System.out.println("database closed");
     }
 }

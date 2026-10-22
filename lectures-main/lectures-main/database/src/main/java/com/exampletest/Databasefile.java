@@ -41,7 +41,7 @@ String dbpath = "jdbc:sqlite:" + dbname;
 public void initializetable(){
 //initialize tables
 //use keyword IF NOT EXISTS to prevent the table getting created again
-String createtable = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NULL, message varchar(50) NOT NULL)";
+String createtable = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NULL, message varchar(50) NOT NULL, timestamp varchar(50) NOT NULL)";
 
         try {
             Statement createstatement = dbConnection.createStatement();
@@ -57,13 +57,15 @@ String createtable = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NUL
 public void setMessage(JSONObject message) throws SQLException{
     //create a sql statement
     //this sql statement is a dynamic statement with variables
-    String storedata = "INSERT INTO users (user, message) VALUES (?, ?)";
+    String storedata = "INSERT INTO users (user, message, timestamp) VALUES (?, ?, ?)";
     //define the values of the variables using preparedStatement
 
     try {
         PreparedStatement ps = dbConnection.prepareStatement(storedata);
         ps.setString(1, message.getString("user"));
         ps.setString(2, message.getString("message"));
+        //store timestamp information
+        ps.setString(3, message.getString("timestamp"));
         //for inserting values we use execute() method
         ps.execute();
         ps.close();
@@ -78,7 +80,7 @@ public void setMessage(JSONObject message) throws SQLException{
 //get data from database and return as a JSONObject
 public JSONObject getMessage(String name_) throws SQLException{
     JSONObject obj = new JSONObject();
-    String getdata = "SELECT user, message FROM users WHERE user = ?";
+    String getdata = "SELECT user, message, timestamp FROM users WHERE user = ?";
     try {
         //create a prepared statement object ps
         PreparedStatement ps = dbConnection.prepareStatement(getdata);
@@ -91,6 +93,7 @@ public JSONObject getMessage(String name_) throws SQLException{
         while (rs.next()){
            obj.put("user", rs.getString("user"));
            obj.put("message", rs.getString("message"));
+           obj.put("timestamp", rs.getString("timestamp"));
         }
         
     } catch (Exception e) {

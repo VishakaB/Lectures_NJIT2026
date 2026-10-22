@@ -2,6 +2,7 @@ package com.exampletest;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import org.json.JSONObject;
@@ -56,7 +57,7 @@ String createtable = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NUL
 public void setMessage(JSONObject message) throws SQLException{
     //create a sql statement
     //this sql statement is a dynamic statement with variables
-    String storedata = "INSERT INTO users (user, message ) VALUES (?, ?)";
+    String storedata = "INSERT INTO users (user, message) VALUES (?, ?)";
     //define the values of the variables using preparedStatement
 
     try {
@@ -72,6 +73,31 @@ public void setMessage(JSONObject message) throws SQLException{
         System.err.println("error in storing data"+e.getMessage());
     }
     
+}
+
+//get data from database and return as a JSONObject
+public JSONObject getMessage(String name_) throws SQLException{
+    JSONObject obj = new JSONObject();
+    String getdata = "SELECT user, message FROM users WHERE user = ?";
+    try {
+        //create a prepared statement object ps
+        PreparedStatement ps = dbConnection.prepareStatement(getdata);
+        //set the variables in the SQL statement using prepared statement object ps
+        ps.setString(1, name_);
+       
+        //save the output of the query in a resultset object
+        ResultSet rs = ps.executeQuery();
+        //process the rs
+        while (rs.next()){
+           obj.put("user", rs.getString("user"));
+           obj.put("message", rs.getString("message"));
+        }
+        
+    } catch (Exception e) {
+        // TODO: handle exception
+        System.err.println("get messages error: "+e.getMessage());
+    } 
+    return obj;
 }
 
 public void close(){

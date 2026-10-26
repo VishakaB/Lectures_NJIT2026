@@ -1,37 +1,116 @@
 package com.example;
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import org.json.JSONObject;
 
+public class Database_123{
+private Connection dbConnection = null;
+private static Database_123 dbInstance = null;
 
-public class Database_123 {
-    //create an instance of the database // single instance throughout application
-    private static Database_123 dbInstance = null;
-    private Connection dbconnection = null;
-
-    //constructor
-    public Database_123 (){
-        //open database instance
-        //continue 
-
+//single instance of database that will be used through the application
+//only one request to reach our database at a certain time //use synchronized for that
+public static synchronized Database_123 getInstance() {
+    if (dbInstance==null) {
+        //create a new db instance
+        dbInstance = new Database_123();
     }
+    return dbInstance;
+}
 
-    //create an instance of the database // single instance of db needed
-    //synchronized used to allow only one request access to the database at a certain time
-    private static synchronized Database_123 getInstance(){
+//constructor
+private Database_123(){
+//open a database
+//give a name to our database
+String dbname = "anyDatabase.db";
+//path to our database
+String dbpath = "jdbc:sqlite:" + dbname;
 
-        //if dbinstance not available // create a new instance
-        if(dbInstance==null){
-            dbInstance = new Database_123();
+//to avoid sql exceptions we will use try  catch blocks
+    try {
+        dbConnection = DriverManager.getConnection(dbpath);
+        initializetable();
+    } catch (Exception e) {
+        System.err.println("database connection error: "+e.getMessage());
+    }
+}
+
+public void initializetable(){
+//initialize tables
+//use keyword IF NOT EXISTS to prevent the table getting created again
+String createtable = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NULL, message varchar(50) NOT NULL, timestamp varchar(50) NOT NULL)";
+
+        try {
+            Statement createstatement = dbConnection.createStatement();
+            createstatement.execute(createtable);
+            System.out.println("Database table successfully created");
+            createstatement.close();
+        } catch (Exception e) {
+            // TODO: handle exception
+            System.err.println("create table sql exception: "+ e.getMessage());
         }
+}
+//create a method to store data in the tables
+//add synchronized keyword to allow only one request at a time 
+public synchronized void setMessage(JSONObject message) throws SQLException{
+    //create a sql statement
+    //this sql statement is a dynamic statement with variables
+    String storedata = "INSERT INTO users (user, message, timestamp) VALUES (?, ?, ?)";
+    //define the values of the variables using preparedStatement
 
-        return dbInstance;
+    try {
+        PreparedStatement ps = dbConnection.prepareStatement(storedata);
+        ps.setString(1, message.getString("user"));
+        ps.setString(2, message.getString("message"));
+        //store timestamp information
+        ps.setString(3, message.getString("timestamp"));
+        //for inserting values we use execute() method
+        ps.execute();
+        ps.close();
+
+    } catch (Exception e) {
+        // TODO: handle exception
+        System.err.println("error in storing data"+e.getMessage());
     }
+    
+}
 
+//get data from database and return as a JSONObject
+public synchronized JSONObject getMessage(String name_) throws SQLException{
+    JSONObject obj = new JSONObject();
+    String getdata = "SELECT user, message, timestamp FROM users WHERE user = ?";
+    try {
+        //create a prepared statement object ps
+        PreparedStatement ps = dbConnection.prepareStatement(getdata);
+        //set the variables in the SQL statement using prepared statement object ps
+        ps.setString(1, name_);
+       
+        //save the output of the query in a resultset object
+        ResultSet rs = ps.executeQuery();
+        //process the rs
+        while (rs.next()){
+           obj.put("user", rs.getString("user"));
+           obj.put("message", rs.getString("message"));
+           obj.put("timestamp", rs.getString("timestamp"));
+        }
+        
+    } catch (Exception e) {
+        // TODO: handle exception
+        System.err.println("get messages error: "+e.getMessage());
+    } 
+    return obj;
+}
 
-    public boolean storeUserdata(String name, String message){
-        //return boolean true or false
-        //if the data was stored successfully return true
+public void close(){
+   try {
+        dbConnection.close();
+   } catch (Exception e) {
+    // TODO: handle exception
+    System.err.println("close database failed: "+e.getMessage());
+   }
+}
 
-        //if data was not stored successfully return false
-
-    }
 }

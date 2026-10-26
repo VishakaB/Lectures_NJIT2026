@@ -3,6 +3,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
+
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
@@ -20,10 +22,10 @@ public class Server
     {
         System.out.println(args.length);
         int portnumber = 8001;
+        Database_123 db = Database_123.getInstance();
         HttpsServer server = HttpsServer.create(new InetSocketAddress(portnumber),0);
         server.createContext("/registration", new registrationHandler());
         server.createContext("/info",new requestHandler());
-      
         //create keystore
         //keytool -genkey -alias alias -keyalg RSA -keystore keystore.jks -keysize 2048
         String keystore_path = args[0];
@@ -70,10 +72,11 @@ public class Server
             // TODO: handle exception
             System.err.println("error: "+ e.getMessage());
         }
-        //create deafult threads for server eexcution
+        //create deafult, same thread, for server excution
         server.setExecutor(null);
+        //server.setExecutor(Executors.newCachedThreadPool());
         server.start();
-        System.out.println("Server started on port: "+ portnumber);
+        System.out.println("Server started on port: "+ "https://localhost:"+portnumber);
     }
 
 }

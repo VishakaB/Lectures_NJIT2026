@@ -38,7 +38,7 @@ public class registrationHandler implements HttpHandler {
         String requestbody = new BufferedReader(new InputStreamReader(stream,StandardCharsets.UTF_8)).lines().collect(Collectors.joining("\n"));
         stream.close();
         
-        String mockrequestbody =; 
+        //String mockrequestbody =; 
 
         //Jsonobject create
         

@@ -3,7 +3,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;
-
+import java.util.concurrent.Executors;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -15,17 +15,18 @@ import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 
 //author Vishaka Basnayake
-//last update: 16th October
+//last update: 27th October
 public class Server 
 {
     public static void main( String[] args ) throws IOException
     {
         System.out.println(args.length);
         int portnumber = 8001;
+        //creating a database instance called db, using getInstance method in db class
         Database_123 db = Database_123.getInstance();
         HttpsServer server = HttpsServer.create(new InetSocketAddress(portnumber),0);
         server.createContext("/registration", new registrationHandler());
-        server.createContext("/info",new requestHandler());
+        server.createContext("/info",new requestHandler(db));
         //create keystore
         //keytool -genkey -alias alias -keyalg RSA -keystore keystore.jks -keysize 2048
         String keystore_path = args[0];
@@ -45,10 +46,9 @@ public class Server
             KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
             kmf.init(ks, passphrase);
 
-//create a trustmanagerfactory to store the public keys
+            //create a trustmanagerfactory to store the public keys
             TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
             tmf.init(ks);
-
 
             SSLContext ssl = SSLContext.getInstance("TLS");
             ssl.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
@@ -73,8 +73,9 @@ public class Server
             System.err.println("error: "+ e.getMessage());
         }
         //create deafult, same thread, for server excution
-        server.setExecutor(null);
-        //server.setExecutor(Executors.newCachedThreadPool());
+        //server.setExecutor(null);
+        //create threadpool having number of threads based on the request demand
+        server.setExecutor(Executors.newCachedThreadPool());
         server.start();
         System.out.println("Server started on port: "+ "https://localhost:"+portnumber);
     }

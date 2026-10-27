@@ -19,7 +19,9 @@ import com.example.utils.*;
 
 public class requestHandler implements HttpHandler {
 
-    public requestHandler(){
+    private Database_123 db;
+    public requestHandler(Database_123 db){
+        this.db = db;
     }
 
     @Override
@@ -35,37 +37,59 @@ public class requestHandler implements HttpHandler {
         } else if (request.equalsIgnoreCase("POST")) {
             System.out.println("received POST or other message");
 
-            // if (headers.containsKey("Content-Type")) {
-            //     contentType = headers.get("Content-Type").get(0);
-            // } else {
-            //     code = 411; // Length Required
-            //     response = "No content type in request";
-            //     sendresponse(exchange, code, response);
-            //     return;
-            // }
+            if (headers.containsKey("Content-Type")) {
+                contentType = headers.get("Content-Type").get(0);
+            } else {
+                code = 411; // Length Required
+                response = "No content type in request";
+                sendresponse(exchange, code, response);
+                return;
+            }
 
-            // if (contentType.equalsIgnoreCase("application/json")) {
-            //     InputStream stream = exchange.getRequestBody();
-            //     String requestjson = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
-            //             .lines().collect(Collectors.joining("\n"));
+            if (contentType.equalsIgnoreCase("application/json")) {
+                InputStream stream = exchange.getRequestBody();
+                String requestjson = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
+                        .lines().collect(Collectors.joining("\n"));
 
-            //     if (requestjson.isEmpty()) {
-            //         code = 412; // Precondition Failed
-            //         response = "No text to post!";
-            //         sendresponse(exchange, code, response);
-            //         return;
-            //     }
-            //     // 
-            //      //sendresponse(exchange, 404, "Not successful");
-            //     if ((requestjson.trim().startsWith("{"))) {
-            //         // Single JSONObject
-                   
+                if (requestjson.isEmpty()) {
+                    code = 412; // Precondition Failed
+                    response = "No text to post!";
+                    sendresponse(exchange, code, response);
+                    return;
+                }
+                // 
 
-              
+                if ((requestjson.trim().startsWith("{"))) {
+                    // Single JSONObject
+                   JSONObject obj = new JSONObject(requestjson);
+                   timeformat tf  = new timeformat();
+                   System.out.println("received obj: "+obj);
 
-            //     }
-              
-            
+                   //run this for loop to create complexity at backend
+                //    
+                   //if the timestamp in the JSONObject has timestamp info in the correct format
+                   if(tf.checktimeformat(obj)){
+                    //store the message in the database instance 
+                    // //creating try catch to catch SQL exceptions when storing data in the db
+                    // add a complex time consuming operations 
+                        try {
+                            for (int i=0; i< 100; i++){
+                                System.out.println("print something: "+ i);
+                            }
+                            db.setMessage(obj);
+                        } catch (SQLException e) {
+                            // TODO: handle exception
+                            System.err.println("error storing messages in the database");
+                        }
+                        sendresponse(exchange, 232, "stored successfully");
+                   } else {
+                        sendresponse(exchange, 404, "missing timestamp in payload");
+                        return;
+                   }
+
+                }
+            }  
+         
         } else {
             sendresponse(exchange, 404, "method not allowed!");
         }

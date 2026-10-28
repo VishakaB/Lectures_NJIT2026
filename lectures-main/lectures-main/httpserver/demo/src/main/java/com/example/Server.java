@@ -2,6 +2,12 @@ package com.example;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.KeyStore;
 import java.util.concurrent.Executors;
 
@@ -9,6 +15,8 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.TrustManagerFactory;
+
+import org.json.JSONObject;
 
 import com.sun.net.httpserver.HttpsServer;
 import com.sun.net.httpserver.HttpsConfigurator;
@@ -27,6 +35,8 @@ public class Server
         HttpsServer server = HttpsServer.create(new InetSocketAddress(portnumber),0);
         server.createContext("/registration", new registrationHandler());
         server.createContext("/info",new requestHandler(db));
+        //access an external api 
+        
         //create keystore
         //keytool -genkey -alias alias -keyalg RSA -keystore keystore.jks -keysize 2048
         String keystore_path = args[0];
@@ -78,6 +88,10 @@ public class Server
         server.setExecutor(Executors.newCachedThreadPool());
         server.start();
         System.out.println("Server started on port: "+ "https://localhost:"+portnumber);
+
+        
     }
 
+
+    
 }

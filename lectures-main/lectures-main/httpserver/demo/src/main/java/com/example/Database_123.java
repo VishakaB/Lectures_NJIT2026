@@ -41,7 +41,7 @@ String dbpath = "jdbc:sqlite:" + dbname;
 public void initializetable(){
 //initialize tables
 //use keyword IF NOT EXISTS to prevent the table getting created again
-String createtable = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NULL, message varchar(50) NOT NULL, timestamp varchar(50) NOT NULL)";
+String createtable   = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NULL, message varchar(50) NOT NULL, timestamp varchar(50) NOT NULL)";
 
         try {
             Statement createstatement = dbConnection.createStatement();
@@ -52,6 +52,8 @@ String createtable = "CREATE TABLE IF NOT EXISTS users (user varchar(50) NOT NUL
             // TODO: handle exception
             System.err.println("create table sql exception: "+ e.getMessage());
         }
+
+
 }
 //create a method to store data in the tables
 //add synchronized keyword to allow only one request at a time 

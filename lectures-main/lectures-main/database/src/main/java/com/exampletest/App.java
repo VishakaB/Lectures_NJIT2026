@@ -7,7 +7,6 @@ import org.json.JSONObject;
 
 import com.exampletest.Utils.timeformat;
 
-
 public class App {
     public static void main(String[] args) {
     System.out.println("database demo");
@@ -18,6 +17,7 @@ public class App {
                 "    \"message\": \"It is a busy day!\",\r\n" + //
                 "    \"timestamp\": \"2026-10-21T06:27:06.616Z\"\r\n" + //
                 "}";
+                
     JSONObject obj = new JSONObject(jsonString);
     
     try {
@@ -31,8 +31,6 @@ public class App {
             System.out.println("storing message in the database");
             db.setMessage(obj);
         }
-
-
     } catch (Exception e) {
         // TODO: handle exception
         System.err.println("data not stored!: "+ e.getMessage());
@@ -48,13 +46,42 @@ public class App {
     //close database
    db.close();
 
-//lets try to find the time information 
-ZonedDateTime time_now = ZonedDateTime.now();
-System.out.println("time now: (general) "+time_now);
+   //use a new database file
+   Database_joins db_joins = Database_joins.getInstance();
+    String jsonUser = "{\r\n" + //
+                "    \"user\": \"Jung\",\r\n" + //
+                "    \"password\": \"1234\"\r\n" + //
+                "}";
 
-//convert the current time to a standard UTC format
-ZonedDateTime time_nowUTC = ZonedDateTime.now(ZoneId.of("UTC")); 
-System.out.println("time in UTC format: "+time_nowUTC);
+    String jsonMessage = "{\r\n" + //
+                "    \"user\" : \"Jung\",\r\n" + //
+                "    \"message\": \"May this be a better day!\"\r\n" + //
+                "}";
+
+    JSONObject Userobj = new JSONObject(jsonUser);
+    try {
+        db_joins.setUser(Userobj);
+    } catch (Exception e) {
+        // TODO: handle exception
+        System.err.println("error: "+ e);
+    }
+
+    JSONObject messageobj = new JSONObject(jsonMessage);
+    try {
+        db_joins.setMessage_joins(messageobj);
+    } catch (Exception e) {
+        // TODO: handle exception
+        System.err.println("error: "+ e);
+    }
+
+    try {
+        JSONObject resultOBJ  = db_joins.getMessage_joins("Jung");
+        System.out.println("the final result is: "+resultOBJ);
+    } catch (Exception e) {
+        // TODO: handle exception
+        System.err.println("error: "+ e);
+    }
+
 
     }
 }

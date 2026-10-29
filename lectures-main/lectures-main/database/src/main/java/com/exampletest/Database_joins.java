@@ -41,7 +41,7 @@ String dbpath = "jdbc:sqlite:" + dbname;
 public void initializetable(){
 //initialize tables
 //use keyword IF NOT EXISTS to prevent the table getting created again
-String createtable_users = "CREATE TABLE IF NOT EXISTS users_table (userid INTEGER PRIMARY KEY AUTOINCREMENT, user varchar(50) NOT NULL, password text NOT NULL)";
+String createtable_users = "CREATE TABLE IF NOT EXISTS users_table (userid INTEGER PRIMARY KEY AUTOINCREMENT, user varchar(50) UNIQUE NOT NULL, password text NOT NULL)";
 
         try {
             Statement createstatement = dbConnection.createStatement();

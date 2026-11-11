@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task List</title>
+</head>
+<body>
+    <h1>Task List</h1>
+
+    <h2>Add a task</h2>
+    <textarea id="taskJson" rows="5" cols="40">{"id": 2, "taskName": "Cooking", "taskDescription": "Daily"}</textarea>
+    <br>
+    <button onclick="addTask()">Add task</button>
+
+    <h2>Get tasks</h2>
+    <button onclick="getTasks()">Get all tasks</button>
+
+    <h2>Delete a task</h2>
+    <input id="deleteId" placeholder="Task id">
+    <button onclick="deleteTask()">Delete task by its order</button>
+
+    <h2>Result</h2>
+    <pre id="result"></pre>
+</body>
+
+<script>
+    //get data
+    function getTasks() {
+    fetch("task-check/task-list")
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("result").textContent = data;
+        });
+    }
+
+function addTask() {
+    const json = document.getElementById("taskJson").value;
+
+    fetch("/task-post", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: json
+    })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("result").textContent = data;
+        });
+}
+
+function deleteTask() {
+    const id = document.getElementById("deleteId").value;
+
+    fetch("/task-delete/" + id, {
+        method: "DELETE"
+    })
+        .then(response => {
+            document.getElementById("result").textContent = "Delete status: " + response.status;
+        });
+}
+</script>
+</html>

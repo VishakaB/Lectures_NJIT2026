@@ -97,7 +97,7 @@ public class Server
             //call the method defined in that class
             obj = exapi.getPokemon("pikachu");
             System.out.println(obj.get("name"));
-            System.out.println(obj);
+            //System.out.println(obj);
             String imageURL = obj.getJSONObject("sprites").getString("front_default");
             System.out.println("link to the image: "+imageURL);
         } catch (Exception e) {
